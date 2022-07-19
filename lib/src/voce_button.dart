@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 enum ButtonStatus { normal, busy, disabled, beingTapped }
 
-class VoceButton extends StatelessWidget {
+class VoceButton extends StatefulWidget {
   /// The button widget in normal state.
   late final Widget normal;
 
@@ -16,6 +16,8 @@ class VoceButton extends StatelessWidget {
 
   /// The async function to be executed when button is pressed.
   final Future<bool> Function() action;
+
+  final double pressedOpacity;
 
   final VoidCallback? onSuccess;
   final VoidCallback? onError;
@@ -34,6 +36,7 @@ class VoceButton extends StatelessWidget {
       this.busy,
       this.disabled,
       required this.action,
+      this.pressedOpacity = 0.4,
       this.onSuccess,
       this.onError,
       this.decoration,
@@ -41,6 +44,8 @@ class VoceButton extends StatelessWidget {
       this.filled = false,
       this.keepNormalWhenBusy = true})
       : super(key: key) {
+    assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
+
     _btnStatus = ValueNotifier(ButtonStatus.normal);
     if (enabled == null || enabled.value) {
       _btnStatus.value = ButtonStatus.normal;
@@ -58,92 +63,181 @@ class VoceButton extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    Widget child = ValueListenableBuilder(
-        valueListenable: _btnStatus,
-        builder: ((context, value, child) {
-          switch (value) {
-            case ButtonStatus.normal:
-              return normal;
-            case ButtonStatus.busy:
-              if (busy != null) {
-                return busy!;
-              } else {
-                return keepNormalWhenBusy
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const CupertinoActivityIndicator(),
-                          const SizedBox(width: 16),
-                          normal
-                        ],
-                      )
-                    : const CupertinoActivityIndicator();
-              }
-            case ButtonStatus.disabled:
-              return disabled ??
-                  ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      1,
-                      0,
-                    ]),
-                    child: normal,
-                  );
-              ;
-            case ButtonStatus.beingTapped:
-              return Opacity(opacity: 0.6, child: normal);
-            default:
-              return normal;
-          }
-        }));
+  State<VoceButton> createState() => _VoceButtonState();
+}
 
-    // void Function()? onPressed => () {
-    //       if (_btnStatus.value == ButtonStatus.normal) {
-    //         executeAsyncAction();
-    //       }
-    //     };
+class _VoceButtonState extends State<VoceButton>
+    with SingleTickerProviderStateMixin {
+  static const Duration kFadeOutDuration = Duration(milliseconds: 120);
+  static const Duration kFadeInDuration = Duration(milliseconds: 180);
+  final Tween<double> _opacityTween = Tween<double>(begin: 1.0);
 
-    if (filled) {
-      return CupertinoButton.filled(onPressed: onPressed, child: child);
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      value: 0.0,
+      vsync: this,
+    );
+    _opacityAnimation = _animationController
+        .drive(CurveTween(curve: Curves.decelerate))
+        .drive(_opacityTween);
+    _setTween();
+  }
+
+  @override
+  void didUpdateWidget(VoceButton old) {
+    super.didUpdateWidget(old);
+    _setTween();
+  }
+
+  void _setTween() {
+    _opacityTween.end = widget.pressedOpacity;
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  bool _buttonHeldDown = false;
+
+  void _handleTapDown(TapDownDetails event) {
+    if (!_buttonHeldDown) {
+      _buttonHeldDown = true;
+      _animate();
     }
-    return CupertinoButton(onPressed: onPressed, child: child);
+  }
+
+  void _handleTapUp(TapUpDetails event) {
+    if (_buttonHeldDown) {
+      _buttonHeldDown = false;
+      _animate();
+    }
+  }
+
+  void _handleTapCancel() {
+    if (_buttonHeldDown) {
+      _buttonHeldDown = false;
+      _animate();
+    }
+  }
+
+  void _animate() {
+    if (_animationController.isAnimating) return;
+    final bool wasHeldDown = _buttonHeldDown;
+    final TickerFuture ticker = _buttonHeldDown
+        ? _animationController.animateTo(1.0,
+            duration: kFadeOutDuration, curve: Curves.easeInOutCubicEmphasized)
+        : _animationController.animateTo(0.0,
+            duration: kFadeInDuration, curve: Curves.easeOutCubic);
+    ticker.then<void>((void value) {
+      if (mounted && wasHeldDown != _buttonHeldDown) _animate();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ValueListenableBuilder(
+            valueListenable: widget._btnStatus,
+            builder: ((context, status, child) {
+              Widget buttonWidget;
+              bool enabled = status == ButtonStatus.normal;
+              switch (status) {
+                case ButtonStatus.normal:
+                  buttonWidget = widget.normal;
+                  break;
+                case ButtonStatus.busy:
+                  if (widget.busy != null) {
+                    buttonWidget = widget.busy!;
+                  } else {
+                    buttonWidget = widget.keepNormalWhenBusy
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const CupertinoActivityIndicator(),
+                              const SizedBox(width: 16),
+                              widget.normal
+                            ],
+                          )
+                        : const CupertinoActivityIndicator();
+                  }
+                  break;
+                case ButtonStatus.disabled:
+                  buttonWidget = widget.disabled ??
+                      ColorFiltered(
+                        colorFilter: const ColorFilter.matrix(<double>[
+                          0.2126,
+                          0.7152,
+                          0.0722,
+                          0,
+                          0,
+                          0.2126,
+                          0.7152,
+                          0.0722,
+                          0,
+                          0,
+                          0.2126,
+                          0.7152,
+                          0.0722,
+                          0,
+                          0,
+                          0,
+                          0,
+                          0,
+                          1,
+                          0,
+                        ]),
+                        child: widget.normal,
+                      );
+                  break;
+
+                case ButtonStatus.beingTapped:
+                  buttonWidget = Opacity(opacity: 0.6, child: widget.normal);
+                  break;
+                default:
+                  buttonWidget = widget.normal;
+                  break;
+              }
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: enabled ? _handleTapDown : null,
+                onTapUp: enabled ? _handleTapUp : null,
+                onTapCancel: enabled ? _handleTapCancel : null,
+                onTap: onPressed,
+                child: FadeTransition(
+                    opacity: _opacityAnimation, child: buttonWidget),
+              );
+            })),
+      ],
+    );
   }
 
   void onPressed() {
-    if (_btnStatus.value == ButtonStatus.normal) {
+    if (widget._btnStatus.value == ButtonStatus.normal) {
       executeAsyncAction();
     }
   }
 
   void executeAsyncAction() async {
-    _btnStatus.value = ButtonStatus.busy;
+    widget._btnStatus.value = ButtonStatus.busy;
 
-    final result = await action();
+    final result = await widget.action();
 
     if (result) {
-      onSuccess == null ? () {} : onSuccess!();
+      widget.onSuccess == null ? () {} : widget.onSuccess!();
     } else {
-      onError == null ? () {} : onError!();
+      widget.onError == null ? () {} : widget.onError!();
     }
 
-    _btnStatus.value = ButtonStatus.normal;
+    widget._btnStatus.value = ButtonStatus.normal;
   }
 }
