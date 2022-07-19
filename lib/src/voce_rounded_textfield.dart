@@ -16,6 +16,8 @@ class VoceRoundedTextField extends StatelessWidget {
   final double fontSize;
   final EdgeInsets scrollPadding;
   final bool filled;
+  final double height;
+  final InputDecoration? decoration;
   final void Function(String)? onChanged;
 
   const VoceRoundedTextField(this.controller,
@@ -31,38 +33,44 @@ class VoceRoundedTextField extends StatelessWidget {
       this.fontSize = 16,
       this.scrollPadding = const EdgeInsets.all(20.0),
       this.filled = true,
+      this.height = 48,
+      this.decoration,
       this.onChanged})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: TextField(
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-            filled: filled,
+    return SizedBox(
+      height: height,
+      child: Center(
+        child: TextField(
+          keyboardType: keyboardType,
+          decoration: decoration ??
+              InputDecoration(
+                  filled: filled,
 
-            // fillColor: Colors.black,
-            // border: InputBorder.none,
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(borderRadius),
-                borderSide: BorderSide.none),
-            isCollapsed: true,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
-        controller: controller,
-        focusNode: focusNode,
-        autocorrect: false,
-        autofocus: true,
-        obscureText: obscureText,
-        textInputAction: textInputAction,
-        textAlignVertical: TextAlignVertical.center,
-        onSubmitted: onSubmitted,
-        onChanged: onChanged,
-        scrollPadding: scrollPadding,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w400,
+                  // fillColor: Colors.black,
+                  // border: InputBorder.none,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      borderSide: BorderSide.none),
+                  isCollapsed: true,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+          controller: controller,
+          focusNode: focusNode,
+          autocorrect: false,
+          autofocus: true,
+          obscureText: obscureText,
+          textInputAction: textInputAction,
+          textAlignVertical: TextAlignVertical.center,
+          onSubmitted: onSubmitted,
+          onChanged: onChanged,
+          scrollPadding: scrollPadding,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
     );
