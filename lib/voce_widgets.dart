@@ -1,7 +1,7 @@
 library voce_widgets;
 
-export 'voce_button.dart';
-export 'voce_rounded_textfield.dart';
+export 'src/voce_button.dart' show VoceButton;
+export 'src/voce_rounded_textfield.dart' show VoceRoundedTextField;
 
 // /// A Calculator.
 // class Calculator {
