@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:voce_widgets/voce_textfield.dart';
+import 'package:voce_widgets/voce_rounded_textfield.dart';
 
 void main() {
   runApp(const MyApp());
