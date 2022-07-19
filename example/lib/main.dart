@@ -76,6 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             VoceRoundedTextField(_controller),
             VoceButton(
+              // width: double.maxFinite,
+              // width: 20,
+
+              width: 100,
+
               decoration: BoxDecoration(
                   color: Colors.amber, borderRadius: BorderRadius.circular(8)),
               normal: const Text("Async Button"),
@@ -86,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onSuccess: () {
                 print("success");
               },
-              enabled: ValueNotifier(true),
+              enabled: ValueNotifier(true), // test
             ),
           ],
         )),

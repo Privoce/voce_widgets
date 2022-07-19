@@ -16,6 +16,7 @@ class VoceRoundedTextField extends StatelessWidget {
   final double fontSize;
   final EdgeInsets scrollPadding;
   final bool filled;
+  final Color? color;
   final double height;
   final InputDecoration? decoration;
   final void Function(String)? onChanged;
@@ -33,6 +34,7 @@ class VoceRoundedTextField extends StatelessWidget {
       this.fontSize = 16,
       this.scrollPadding = const EdgeInsets.all(20.0),
       this.filled = true,
+      this.color,
       this.height = 48,
       this.decoration,
       this.onChanged})
@@ -48,15 +50,13 @@ class VoceRoundedTextField extends StatelessWidget {
           decoration: decoration ??
               InputDecoration(
                   filled: filled,
-
-                  // fillColor: Colors.black,
-                  // border: InputBorder.none,
+                  fillColor: color ?? Colors.white,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(borderRadius),
                       borderSide: BorderSide.none),
                   isCollapsed: true,
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
           controller: controller,
           focusNode: focusNode,
           autocorrect: false,
