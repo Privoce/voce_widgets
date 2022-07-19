@@ -76,6 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             VoceRoundedTextField(_controller),
             VoceButton(
+              decoration: BoxDecoration(
+                  color: Colors.amber, borderRadius: BorderRadius.circular(8)),
               normal: const Text("Async Button"),
               action: () async {
                 await Future.delayed(const Duration(seconds: 1));
@@ -85,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 print("success");
               },
               enabled: ValueNotifier(true),
-              filled: true,
             ),
           ],
         )),

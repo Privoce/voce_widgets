@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-enum ButtonStatus { normal, busy, disabled, beingTapped }
+enum ButtonStatus { normal, busy, disabled }
 
 class VoceButton extends StatefulWidget {
   /// The button widget in normal state.
@@ -21,9 +21,13 @@ class VoceButton extends StatefulWidget {
 
   final VoidCallback? onSuccess;
   final VoidCallback? onError;
-  final BoxDecoration? decoration;
-  final bool filled;
+
   final bool keepNormalWhenBusy;
+
+  final double? height;
+  final double? width;
+  final BoxDecoration? decoration;
+  final EdgeInsets? contentPadding;
 
   /// ValueNotifier for button status.
   /// Status include [ButtonStatus.normal], [ButtonStatus.busy],
@@ -39,9 +43,11 @@ class VoceButton extends StatefulWidget {
       this.pressedOpacity = 0.4,
       this.onSuccess,
       this.onError,
+      this.height,
+      this.width,
       this.decoration,
+      this.contentPadding,
       ValueNotifier<bool>? enabled,
-      this.filled = false,
       this.keepNormalWhenBusy = true})
       : super(key: key) {
     assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
@@ -143,6 +149,11 @@ class _VoceButtonState extends State<VoceButton>
 
   @override
   Widget build(BuildContext context) {
+    final CupertinoThemeData themeData = CupertinoTheme.of(context);
+    final Color primaryColor = themeData.primaryColor;
+    final TextStyle defaultTextStyle =
+        themeData.textTheme.textStyle.copyWith(color: primaryColor);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -153,56 +164,76 @@ class _VoceButtonState extends State<VoceButton>
               bool enabled = status == ButtonStatus.normal;
               switch (status) {
                 case ButtonStatus.normal:
-                  buttonWidget = widget.normal;
+                  buttonWidget = Container(
+                      height: widget.height,
+                      width: widget.width,
+                      decoration: widget.decoration,
+                      padding: widget.contentPadding ?? const EdgeInsets.all(8),
+                      child: widget.normal);
                   break;
                 case ButtonStatus.busy:
                   if (widget.busy != null) {
-                    buttonWidget = widget.busy!;
+                    buttonWidget = Container(
+                        height: widget.height,
+                        width: widget.width,
+                        decoration: widget.decoration,
+                        padding:
+                            widget.contentPadding ?? const EdgeInsets.all(8),
+                        child: widget.busy!);
                   } else {
-                    buttonWidget = widget.keepNormalWhenBusy
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const CupertinoActivityIndicator(),
-                              const SizedBox(width: 16),
-                              widget.normal
-                            ],
-                          )
-                        : const CupertinoActivityIndicator();
+                    buttonWidget = Container(
+                        height: widget.height,
+                        width: widget.width,
+                        decoration: widget.decoration,
+                        padding:
+                            widget.contentPadding ?? const EdgeInsets.all(8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CupertinoActivityIndicator(color: primaryColor),
+                            const SizedBox(width: 16),
+                            buttonWidget = widget.keepNormalWhenBusy
+                                ? widget.normal
+                                : CupertinoActivityIndicator(
+                                    color: primaryColor),
+                          ],
+                        ));
                   }
                   break;
                 case ButtonStatus.disabled:
                   buttonWidget = widget.disabled ??
                       ColorFiltered(
-                        colorFilter: const ColorFilter.matrix(<double>[
-                          0.2126,
-                          0.7152,
-                          0.0722,
-                          0,
-                          0,
-                          0.2126,
-                          0.7152,
-                          0.0722,
-                          0,
-                          0,
-                          0.2126,
-                          0.7152,
-                          0.0722,
-                          0,
-                          0,
-                          0,
-                          0,
-                          0,
-                          1,
-                          0,
-                        ]),
-                        child: widget.normal,
-                      );
+                          colorFilter: const ColorFilter.matrix(<double>[
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                          ]),
+                          child: Container(
+                              height: widget.height,
+                              width: widget.width,
+                              decoration: widget.decoration,
+                              padding: widget.contentPadding ??
+                                  const EdgeInsets.all(8),
+                              child: widget.normal));
                   break;
 
-                case ButtonStatus.beingTapped:
-                  buttonWidget = Opacity(opacity: 0.6, child: widget.normal);
-                  break;
                 default:
                   buttonWidget = widget.normal;
                   break;
@@ -214,7 +245,9 @@ class _VoceButtonState extends State<VoceButton>
                 onTapCancel: enabled ? _handleTapCancel : null,
                 onTap: onPressed,
                 child: FadeTransition(
-                    opacity: _opacityAnimation, child: buttonWidget),
+                    opacity: _opacityAnimation,
+                    child: DefaultTextStyle(
+                        style: defaultTextStyle, child: buttonWidget)),
               );
             })),
       ],
