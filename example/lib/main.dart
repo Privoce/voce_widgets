@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:voce_widgets/voce_rounded_textfield.dart';
+import 'package:voce_widgets/voce_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -75,6 +76,18 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView(
           children: [
             VoceRoundedTextField(_controller),
+            VoceButton(
+              normal: const Text("Async Button"),
+              action: () async {
+                await Future.delayed(const Duration(seconds: 1));
+                return true;
+              },
+              onSuccess: () {
+                print("success");
+              },
+              enabled: ValueNotifier(true),
+              filled: true,
+            ),
           ],
         )),
       ),
