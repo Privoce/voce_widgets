@@ -28,13 +28,16 @@ class VoceButton extends StatefulWidget {
 
   final double? height;
   final double? width;
-  late BoxDecoration? decoration;
+  final BoxDecoration? decoration;
   final EdgeInsets? contentPadding;
+
+  final Color? contentColor;
 
   /// ValueNotifier for button status.
   /// Status include [ButtonStatus.normal], [ButtonStatus.busy],
   /// [ButtonStatus.disabled] and [ButtonStatus.beingTapped].
-  late final ValueNotifier<ButtonStatus> _btnStatus;
+  final ValueNotifier<ButtonStatus> _btnStatus =
+      ValueNotifier(ButtonStatus.normal);
 
   VoceButton(
       {Key? key,
@@ -51,11 +54,11 @@ class VoceButton extends StatefulWidget {
       this.decoration,
       this.contentPadding,
       ValueNotifier<bool>? enabled,
+      this.contentColor,
       this.keepNormalWhenBusy = true})
       : super(key: key) {
     assert(pressedOpacity >= 0.0 && pressedOpacity <= 1.0);
 
-    _btnStatus = ValueNotifier(ButtonStatus.normal);
     if (enabled == null || enabled.value) {
       _btnStatus.value = ButtonStatus.normal;
     } else {
@@ -153,7 +156,7 @@ class _VoceButtonState extends State<VoceButton>
   @override
   Widget build(BuildContext context) {
     final CupertinoThemeData themeData = CupertinoTheme.of(context);
-    final Color primaryColor = themeData.primaryColor;
+    final Color primaryColor = widget.contentColor ?? themeData.primaryColor;
     final TextStyle defaultTextStyle =
         themeData.textTheme.textStyle.copyWith(color: primaryColor);
 

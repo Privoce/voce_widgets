@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      // theme: ThemeData.light(),
       theme: ThemeData.dark(),
-      // darkTheme: ThemeData.dark(),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      backgroundColor: Colors.grey,
+      // backgroundColor: Colors.grey,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView(
           children: [
             VoceTextField(_controller),
-            VoceTextField.filled(_filledController),
+            VoceTextField.filled(title: const Text("Title"), _filledController),
             VoceButton(
               // width: double.maxFinite,
               // width: 20,

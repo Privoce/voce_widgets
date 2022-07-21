@@ -10,6 +10,7 @@ class VoceTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final bool obscureText;
+  final Widget? title;
 
   final bool enableMargin;
   final bool enableDeco;
@@ -19,6 +20,7 @@ class VoceTextField extends StatelessWidget {
   final bool _filled;
   final Color? color;
   final double height;
+  final int? maxLength;
   final InputDecoration? decoration;
   final void Function(String)? onChanged;
 
@@ -35,8 +37,10 @@ class VoceTextField extends StatelessWidget {
       this.fontSize = 16,
       this.scrollPadding = const EdgeInsets.all(20.0),
       this.height = 48,
+      this.maxLength,
       this.decoration,
-      this.onChanged})
+      this.onChanged,
+      this.title})
       : _filled = false,
         color = null,
         super(key: key);
@@ -55,44 +59,54 @@ class VoceTextField extends StatelessWidget {
       this.scrollPadding = const EdgeInsets.all(20.0),
       this.color,
       this.height = 48,
+      this.maxLength,
       this.decoration,
-      this.onChanged})
+      this.onChanged,
+      this.title})
       : _filled = true,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: Center(
-        child: TextField(
-          keyboardType: keyboardType,
-          decoration: decoration ??
-              InputDecoration(
-                  filled: _filled,
-                  fillColor: color ?? Colors.white,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(borderRadius),
-                      borderSide: BorderSide.none),
-                  isCollapsed: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
-          controller: controller,
-          focusNode: focusNode,
-          autocorrect: false,
-          autofocus: true,
-          obscureText: obscureText,
-          textInputAction: textInputAction,
-          textAlignVertical: TextAlignVertical.center,
-          onSubmitted: onSubmitted,
-          onChanged: onChanged,
-          scrollPadding: scrollPadding,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w400,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (title != null) title!,
+        if (title != null) const SizedBox(height: 4),
+        SizedBox(
+          // height: height,
+          child: Center(
+            child: TextField(
+              keyboardType: keyboardType,
+              decoration: decoration ??
+                  InputDecoration(
+                      filled: _filled,
+                      fillColor: color ?? Colors.white,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(borderRadius),
+                          borderSide: BorderSide.none),
+                      isCollapsed: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12)),
+              maxLength: maxLength,
+              controller: controller,
+              focusNode: focusNode,
+              autocorrect: false,
+              autofocus: true,
+              obscureText: obscureText,
+              textInputAction: textInputAction,
+              textAlignVertical: TextAlignVertical.center,
+              onSubmitted: onSubmitted,
+              onChanged: onChanged,
+              scrollPadding: scrollPadding,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
