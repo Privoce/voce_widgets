@@ -1,8 +1,9 @@
 library voce_widgets;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class VoceRoundedTextField extends StatelessWidget {
+class VoceTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
   final Function(String)? onSubmitted;
@@ -15,13 +16,13 @@ class VoceRoundedTextField extends StatelessWidget {
   final double borderRadius;
   final double fontSize;
   final EdgeInsets scrollPadding;
-  final bool filled;
+  final bool _filled;
   final Color? color;
   final double height;
   final InputDecoration? decoration;
   final void Function(String)? onChanged;
 
-  const VoceRoundedTextField(this.controller,
+  const VoceTextField(this.controller,
       {Key? key,
       this.focusNode,
       this.onSubmitted,
@@ -33,12 +34,31 @@ class VoceRoundedTextField extends StatelessWidget {
       this.borderRadius = 8,
       this.fontSize = 16,
       this.scrollPadding = const EdgeInsets.all(20.0),
-      this.filled = true,
+      this.height = 48,
+      this.decoration,
+      this.onChanged})
+      : _filled = false,
+        color = null,
+        super(key: key);
+
+  const VoceTextField.filled(this.controller,
+      {Key? key,
+      this.focusNode,
+      this.onSubmitted,
+      this.keyboardType,
+      this.textInputAction,
+      this.obscureText = false,
+      this.enableMargin = true,
+      this.enableDeco = true,
+      this.borderRadius = 8,
+      this.fontSize = 16,
+      this.scrollPadding = const EdgeInsets.all(20.0),
       this.color,
       this.height = 48,
       this.decoration,
       this.onChanged})
-      : super(key: key);
+      : _filled = true,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +69,7 @@ class VoceRoundedTextField extends StatelessWidget {
           keyboardType: keyboardType,
           decoration: decoration ??
               InputDecoration(
-                  filled: filled,
+                  filled: _filled,
                   fillColor: color ?? Colors.white,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(borderRadius),

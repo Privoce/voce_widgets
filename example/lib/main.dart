@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController _controller = TextEditingController();
+    TextEditingController _filledController = TextEditingController();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -74,7 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
             // in the middle of the parent.
             child: ListView(
           children: [
-            VoceRoundedTextField(_controller),
+            VoceTextField(_controller),
+            VoceTextField.filled(_filledController),
             VoceButton(
               // width: double.maxFinite,
               // width: 20,
