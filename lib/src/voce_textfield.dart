@@ -1,9 +1,11 @@
 library voce_widgets;
 
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class VoceTextField extends StatelessWidget {
+class VoceTextField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
   final Function(String)? onSubmitted;
@@ -67,40 +69,73 @@ class VoceTextField extends StatelessWidget {
         super(key: key);
 
   @override
+  State<VoceTextField> createState() => _VoceTextFieldState();
+}
+
+class _VoceTextFieldState extends State<VoceTextField> {
+  int? _maxLength;
+
+  @override
+  initState() {
+    super.initState();
+    _maxLength = widget.maxLength ?? 32;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (title != null) title!,
-        if (title != null) const SizedBox(height: 4),
+        if (widget.title != null) widget.title!,
+        if (widget.title != null) const SizedBox(height: 4),
         SizedBox(
           // height: height,
           child: Center(
             child: TextField(
-              keyboardType: keyboardType,
-              decoration: decoration ??
+              keyboardType: widget.keyboardType,
+              decoration: widget.decoration ??
                   InputDecoration(
-                      filled: _filled,
-                      fillColor: color ?? Colors.white,
+                      filled: widget._filled,
+                      fillColor: widget.color ?? Colors.white,
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(borderRadius),
+                          borderRadius:
+                              BorderRadius.circular(widget.borderRadius),
                           borderSide: BorderSide.none),
                       isCollapsed: true,
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12)),
-              maxLength: maxLength,
-              controller: controller,
-              focusNode: focusNode,
+              buildCounter: (context,
+                  {required currentLength, required isFocused, maxLength}) {
+                int utf8Length = utf8.encode(widget.controller.text).length;
+                if (currentLength > 0 && utf8Length > 1) {
+                  var twoCharsLength = utf8Length - currentLength;
+                  return Text(
+                    '$twoCharsLength/$maxLength',
+                    style: Theme.of(context).textTheme.caption,
+                  );
+                } else {
+                  return Text(
+                    '$utf8Length/$maxLength',
+                    style: Theme.of(context).textTheme.caption,
+                  );
+                }
+              },
+              inputFormatters: [
+                _Utf8LengthLimitingTextInputFormatter(_maxLength!)
+              ],
+              maxLength: _maxLength,
+              controller: widget.controller,
+              focusNode: widget.focusNode,
               autocorrect: false,
               autofocus: true,
-              obscureText: obscureText,
-              textInputAction: textInputAction,
+              obscureText: widget.obscureText,
+              textInputAction: widget.textInputAction,
               textAlignVertical: TextAlignVertical.center,
-              onSubmitted: onSubmitted,
-              onChanged: onChanged,
-              scrollPadding: scrollPadding,
+              onSubmitted: widget.onSubmitted,
+              onChanged: widget.onChanged,
+              scrollPadding: widget.scrollPadding,
               style: TextStyle(
-                fontSize: fontSize,
+                fontSize: widget.fontSize,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -108,5 +143,61 @@ class VoceTextField extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
+  _Utf8LengthLimitingTextInputFormatter(this.maxLength)
+      : assert(maxLength == null || maxLength == -1 || maxLength > 0);
+
+  final int maxLength;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (maxLength != null &&
+        maxLength > 0 &&
+        bytesLength(newValue.text) > maxLength) {
+      // If already at the maximum and tried to enter even more, keep the old value.
+      if (bytesLength(oldValue.text) == maxLength) {
+        return oldValue;
+      }
+      return truncate(newValue, maxLength);
+    }
+    return newValue;
+  }
+
+  static TextEditingValue truncate(TextEditingValue value, int maxLength) {
+    var newValue = '';
+    if (bytesLength(value.text) > maxLength) {
+      var length = 0;
+
+      value.text.characters.takeWhile((char) {
+        var nbBytes = bytesLength(char);
+
+        if (length + nbBytes <= maxLength) {
+          newValue += char;
+
+          length += nbBytes;
+          return true;
+        }
+        return false;
+      });
+    }
+    return TextEditingValue(
+      text: newValue,
+      selection: value.selection.copyWith(
+        baseOffset: min(value.selection.start, newValue.length),
+        extentOffset: min(value.selection.end, newValue.length),
+      ),
+      composing: TextRange.empty,
+    );
+  }
+
+  static int bytesLength(String value) {
+    var twoCharsLength = utf8.encode(value).length - 1;
+    return twoCharsLength;
   }
 }
