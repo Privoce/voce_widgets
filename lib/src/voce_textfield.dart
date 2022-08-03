@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_emoji/flutter_emoji.dart';
 
 class VoceTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -24,6 +25,7 @@ class VoceTextField extends StatefulWidget {
   final double height;
   final int? maxLength;
   final InputDecoration? decoration;
+  final bool enableCounterText;
   final void Function(String)? onChanged;
 
   const VoceTextField(this.controller,
@@ -42,6 +44,7 @@ class VoceTextField extends StatefulWidget {
       this.maxLength,
       this.decoration,
       this.onChanged,
+      this.enableCounterText = false,
       this.title})
       : _filled = false,
         color = null,
@@ -64,7 +67,8 @@ class VoceTextField extends StatefulWidget {
       this.maxLength,
       this.decoration,
       this.onChanged,
-      this.title})
+      this.title,
+      this.enableCounterText = false})
       : _filled = true,
         super(key: key);
 
@@ -106,19 +110,15 @@ class _VoceTextFieldState extends State<VoceTextField> {
                           horizontal: 16, vertical: 12)),
               buildCounter: (context,
                   {required currentLength, required isFocused, maxLength}) {
-                int utf8Length = utf8.encode(widget.controller.text).length;
-                if (currentLength > 0 && utf8Length > 1) {
-                  var twoCharsLength = utf8Length - currentLength;
-                  return Text(
-                    '$twoCharsLength/$maxLength',
-                    style: Theme.of(context).textTheme.caption,
-                  );
-                } else {
-                  return Text(
-                    '$utf8Length/$maxLength',
-                    style: Theme.of(context).textTheme.caption,
-                  );
-                }
+                if (!widget.enableCounterText) return null;
+                int length = _Utf8LengthLimitingTextInputFormatter.bytesLength(
+                    widget.controller.text);
+
+                return Text(
+                  '$length/$maxLength',
+                  style: Theme.of(context).textTheme.caption,
+                );
+                // }
               },
               inputFormatters: [
                 _Utf8LengthLimitingTextInputFormatter(_maxLength!)
@@ -148,7 +148,7 @@ class _VoceTextFieldState extends State<VoceTextField> {
 
 class _Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
   _Utf8LengthLimitingTextInputFormatter(this.maxLength)
-      : assert(maxLength == null || maxLength == -1 || maxLength > 0);
+      : assert(maxLength == -1 || maxLength > 0);
 
   final int maxLength;
 
@@ -157,9 +157,7 @@ class _Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (maxLength != null &&
-        maxLength > 0 &&
-        bytesLength(newValue.text) > maxLength) {
+    if (maxLength > 0 && bytesLength(newValue.text) > maxLength) {
       // If already at the maximum and tried to enter even more, keep the old value.
       if (bytesLength(oldValue.text) == maxLength) {
         return oldValue;
@@ -197,7 +195,38 @@ class _Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
   }
 
   static int bytesLength(String value) {
-    var twoCharsLength = utf8.encode(value).length - 1;
-    return twoCharsLength;
+    // var twoCharsLength = utf8.encode(value).length - 1;
+    // return twoCharsLength;
+
+    int count = 0;
+
+    final charIterator = value.characters.iterator;
+    while (charIterator.moveNext()) {
+      final char = charIterator.current;
+
+      if (isEmoji(char) || isCJK(char)) {
+        count += 2;
+      } else {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  static bool isCJK(String char) {
+    String p =
+        r"\p{Script=Han}|\p{Script=Hiragana}|\p{Script=Katakana}|\p{Script=Hangul}|\p{Script=Arabic}";
+    String punctuation = "[\u3000-\u303F]";
+    String chinesePunc =
+        '[＂＃＄％＆\'\'（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‛„‟…‧﹏！？｡。]';
+
+    return RegExp(p, unicode: true).hasMatch(char) ||
+        RegExp(punctuation, unicode: true).hasMatch(char) ||
+        RegExp(chinesePunc, unicode: true).hasMatch(char);
+  }
+
+  static bool isEmoji(String char) {
+    var parser = EmojiParser();
+    return parser.hasEmoji(char);
   }
 }
