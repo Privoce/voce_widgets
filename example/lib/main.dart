@@ -76,7 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView(
           children: [
             VoceTextField(_controller),
-            VoceTextField.filled(title: const Text("Title"), _filledController),
+            VoceTextField.filled(
+              title: const Text("Title"),
+              _filledController,
+              footer: Text("footer"),
+            ),
             VoceButton(
               // width: double.maxFinite,
               // width: 20,
