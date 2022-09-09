@@ -16,7 +16,7 @@ class VoceTextField extends StatefulWidget {
   final bool obscureText;
   final Widget? title;
   final Widget? footer;
-
+  final bool enabled;
   final bool enableMargin;
   final bool enableDeco;
   final double borderRadius;
@@ -48,7 +48,8 @@ class VoceTextField extends StatefulWidget {
       this.onChanged,
       this.enableCounterText = false,
       this.title,
-      this.footer})
+      this.footer,
+      this.enabled = true})
       : _filled = false,
         color = null,
         super(key: key);
@@ -72,7 +73,8 @@ class VoceTextField extends StatefulWidget {
       this.onChanged,
       this.title,
       this.footer,
-      this.enableCounterText = false})
+      this.enableCounterText = false,
+      this.enabled = true})
       : _filled = true,
         super(key: key);
 
@@ -100,6 +102,7 @@ class _VoceTextFieldState extends State<VoceTextField> {
           // height: height,
           child: Center(
             child: TextField(
+              enabled: widget.enabled,
               keyboardType: widget.keyboardType,
               decoration: widget.decoration ??
                   InputDecoration(

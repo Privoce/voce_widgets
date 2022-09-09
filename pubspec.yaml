@@ -1,6 +1,6 @@
 name: voce_widgets
-description: A new Flutter package project.
-version: 0.0.3
+description: A widget set for Privoce projects.
+version: 0.0.4
 # homepage:
 
 environment:
