@@ -104,77 +104,85 @@ class _VoceTextFieldState extends State<VoceTextField> {
       children: [
         if (widget.title != null) widget.title!,
         if (widget.title != null) const SizedBox(height: 4),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ValueListenableBuilder<bool>(
-                  valueListenable: showObscureText,
-                  builder: (context, visible, _) {
-                    return TextField(
-                      enabled: widget.enabled,
-                      keyboardType: widget.keyboardType,
-                      decoration: widget.decoration ??
-                          InputDecoration(
-                              filled: widget._filled,
-                              fillColor: widget.color ?? Colors.white,
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      widget.borderRadius),
-                                  borderSide: BorderSide.none),
-                              isCollapsed: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12)),
-                      buildCounter: (context,
-                          {required currentLength,
-                          required isFocused,
-                          maxLength}) {
-                        if (!widget.enableCounterText) return null;
-                        int length = VoceTextInputFormatter.bytesLength(
-                            widget.controller.text);
-
-                        return Text(
-                          '$length/$maxLength',
-                          style: Theme.of(context).textTheme.caption,
-                        );
-                        // }
-                      },
-                      inputFormatters: [VoceTextInputFormatter(_maxLength!)],
-                      maxLength: _maxLength,
-                      controller: widget.controller,
-                      focusNode: widget.focusNode,
-                      autocorrect: false,
-                      autofocus: true,
-                      obscureText: widget.obscureText && !visible,
-                      textInputAction: widget.textInputAction,
-                      textAlignVertical: TextAlignVertical.center,
-                      onSubmitted: widget.onSubmitted,
-                      onChanged: widget.onChanged,
-                      scrollPadding: widget.scrollPadding,
-                      style: TextStyle(
-                        fontSize: widget.fontSize,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    );
-                  }),
-            ),
-            if (widget.obscureText && widget.enableVisibleObscureText)
-              SizedBox(
-                width: 36,
+        Container(
+          decoration: widget.enableVisibleObscureText
+              ? BoxDecoration(
+                  color: widget.color ?? Colors.white,
+                  borderRadius: BorderRadius.circular(widget.borderRadius))
+              : null,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
                 child: ValueListenableBuilder<bool>(
-                  valueListenable: showObscureText,
-                  builder: (context, visible, child) {
-                    return CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        child: Icon(
-                            visible ? Icons.visibility_off : Icons.visibility),
-                        onPressed: () {
-                          showObscureText.value = !showObscureText.value;
-                        });
-                  },
-                ),
-              )
-          ],
+                    valueListenable: showObscureText,
+                    builder: (context, visible, _) {
+                      return TextField(
+                        enabled: widget.enabled,
+                        keyboardType: widget.keyboardType,
+                        decoration: widget.decoration ??
+                            InputDecoration(
+                                filled: widget._filled,
+                                fillColor: widget.color ?? Colors.white,
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        widget.borderRadius),
+                                    borderSide: BorderSide.none),
+                                isCollapsed: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12)),
+                        buildCounter: (context,
+                            {required currentLength,
+                            required isFocused,
+                            maxLength}) {
+                          if (!widget.enableCounterText) return null;
+                          int length = VoceTextInputFormatter.bytesLength(
+                              widget.controller.text);
+
+                          return Text(
+                            '$length/$maxLength',
+                            style: Theme.of(context).textTheme.caption,
+                          );
+                          // }
+                        },
+                        inputFormatters: [VoceTextInputFormatter(_maxLength!)],
+                        maxLength: _maxLength,
+                        controller: widget.controller,
+                        focusNode: widget.focusNode,
+                        autocorrect: false,
+                        autofocus: true,
+                        obscureText: widget.obscureText && !visible,
+                        textInputAction: widget.textInputAction,
+                        textAlignVertical: TextAlignVertical.center,
+                        onSubmitted: widget.onSubmitted,
+                        onChanged: widget.onChanged,
+                        scrollPadding: widget.scrollPadding,
+                        style: TextStyle(
+                          fontSize: widget.fontSize,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      );
+                    }),
+              ),
+              if (widget.obscureText && widget.enableVisibleObscureText)
+                SizedBox(
+                  width: 36,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: showObscureText,
+                    builder: (context, visible, child) {
+                      return CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: Icon(visible
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            showObscureText.value = !showObscureText.value;
+                          });
+                    },
+                  ),
+                )
+            ],
+          ),
         ),
         if (widget.footer != null) const SizedBox(height: 4),
         if (widget.footer != null) widget.footer!
