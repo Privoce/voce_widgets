@@ -56,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     TextEditingController _controller = TextEditingController();
     TextEditingController _filledController = TextEditingController();
+    TextEditingController _obscuredController = TextEditingController();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -79,6 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
             VoceTextField.filled(
               title: const Text("Title"),
               _filledController,
+              footer: Text("footer"),
+            ),
+            VoceTextField.filled(
+              title: const Text("Obscured Text Title"),
+              _obscuredController,
+              obscureText: true,
+              enableVisibleObscureText: true,
               footer: Text("footer"),
             ),
             VoceButton(
