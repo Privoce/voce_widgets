@@ -30,6 +30,7 @@ class VoceTextField extends StatefulWidget {
   final int? maxLength;
   final InputDecoration? decoration;
   final bool enableCounterText;
+  final String? hintText;
   final void Function(String)? onChanged;
 
   const VoceTextField(this.controller,
@@ -52,6 +53,7 @@ class VoceTextField extends StatefulWidget {
       this.enableCounterText = false,
       this.title,
       this.footer,
+      this.hintText,
       this.enabled = true})
       : _filled = false,
         color = null,
@@ -78,6 +80,7 @@ class VoceTextField extends StatefulWidget {
       this.title,
       this.footer,
       this.enableCounterText = false,
+      this.hintText,
       this.enabled = true})
       : _filled = true,
         super(key: key);
@@ -130,7 +133,9 @@ class _VoceTextFieldState extends State<VoceTextField> {
                                     borderSide: BorderSide.none),
                                 isCollapsed: true,
                                 contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12)),
+                                    horizontal: 16, vertical: 12),
+                                hintText: widget.hintText,
+                                hintMaxLines: 1),
                         buildCounter: (context,
                             {required currentLength,
                             required isFocused,

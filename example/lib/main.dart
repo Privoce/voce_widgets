@@ -13,8 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      // theme: ThemeData.light(),
-      theme: ThemeData.dark(),
+      theme: ThemeData.light(),
+      // theme: ThemeData.dark(),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -87,6 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
               _obscuredController,
               obscureText: true,
               enableVisibleObscureText: true,
+              footer: Text("footer"),
+            ),
+            VoceTextField.filled(
+              title: const Text("Hint text"),
+              _obscuredController,
+              hintText: "this is hint text",
               footer: Text("footer"),
             ),
             VoceButton(
