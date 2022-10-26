@@ -150,7 +150,9 @@ class _VoceTextFieldState extends State<VoceTextField> {
                           );
                           // }
                         },
-                        inputFormatters: [VoceTextInputFormatter(_maxLength!)],
+                        inputFormatters: _maxLength != null
+                            ? [VoceTextInputFormatter(_maxLength!)]
+                            : null,
                         maxLength: _maxLength,
                         controller: widget.controller,
                         focusNode: widget.focusNode,
