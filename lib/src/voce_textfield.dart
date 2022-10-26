@@ -97,7 +97,7 @@ class _VoceTextFieldState extends State<VoceTextField> {
   @override
   initState() {
     super.initState();
-    _maxLength = widget.maxLength ?? 32;
+    _maxLength = widget.maxLength;
   }
 
   @override
