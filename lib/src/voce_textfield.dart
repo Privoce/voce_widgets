@@ -26,6 +26,7 @@ class VoceTextField extends StatefulWidget {
   final EdgeInsets scrollPadding;
   final bool _filled;
   final Color? color;
+  final Color? disableColor;
   final double height;
   final int? maxLength;
   final InputDecoration? decoration;
@@ -57,6 +58,7 @@ class VoceTextField extends StatefulWidget {
       this.enabled = true})
       : _filled = false,
         color = null,
+        disableColor = null,
         super(key: key);
 
   const VoceTextField.filled(this.controller,
@@ -73,6 +75,7 @@ class VoceTextField extends StatefulWidget {
       this.fontSize = 16,
       this.scrollPadding = const EdgeInsets.all(20.0),
       this.color,
+      this.disableColor,
       this.height = 48,
       this.maxLength,
       this.decoration,
@@ -126,7 +129,9 @@ class _VoceTextFieldState extends State<VoceTextField> {
                         decoration: widget.decoration ??
                             InputDecoration(
                                 filled: widget._filled,
-                                fillColor: widget.color ?? Colors.white,
+                                fillColor: widget.enabled
+                                    ? (widget.color ?? Colors.white)
+                                    : (widget.disableColor ?? Colors.grey),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(
                                         widget.borderRadius),
