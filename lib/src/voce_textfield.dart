@@ -113,7 +113,9 @@ class _VoceTextFieldState extends State<VoceTextField> {
         Container(
           decoration: widget.enableVisibleObscureText
               ? BoxDecoration(
-                  color: widget.color ?? Colors.white,
+                  color: widget.enabled
+                      ? (widget.color ?? Colors.white)
+                      : (widget.disableColor ?? Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(widget.borderRadius))
               : null,
           child: Row(
@@ -185,9 +187,10 @@ class _VoceTextFieldState extends State<VoceTextField> {
                     builder: (context, visible, child) {
                       return CupertinoButton(
                           padding: EdgeInsets.zero,
-                          child: Icon(visible
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                          child: Icon(
+                              visible ? Icons.visibility_off : Icons.visibility,
+                              color:
+                                  widget.enabled ? null : Colors.grey.shade300),
                           onPressed: () {
                             showObscureText.value = !showObscureText.value;
                           });
