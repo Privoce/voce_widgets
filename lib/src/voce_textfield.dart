@@ -131,7 +131,8 @@ class _VoceTextFieldState extends State<VoceTextField> {
                                 filled: widget._filled,
                                 fillColor: widget.enabled
                                     ? (widget.color ?? Colors.white)
-                                    : (widget.disableColor ?? Colors.grey),
+                                    : (widget.disableColor ??
+                                        Colors.grey.shade300),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(
                                         widget.borderRadius),
