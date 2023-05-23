@@ -1,16 +1,13 @@
 library voce_widgets;
 
-import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_emoji/flutter_emoji.dart';
 import 'package:voce_widgets/src/voce_text_input_formatter.dart';
 
 class VoceTextField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
+  final bool autofocus;
   final Function(String)? onSubmitted;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -37,6 +34,7 @@ class VoceTextField extends StatefulWidget {
   const VoceTextField(this.controller,
       {Key? key,
       this.focusNode,
+      this.autofocus = false,
       this.onSubmitted,
       this.keyboardType,
       this.textInputAction,
@@ -64,6 +62,7 @@ class VoceTextField extends StatefulWidget {
   const VoceTextField.filled(this.controller,
       {Key? key,
       this.focusNode,
+      this.autofocus = false,
       this.onSubmitted,
       this.keyboardType,
       this.textInputAction,
@@ -165,7 +164,7 @@ class _VoceTextFieldState extends State<VoceTextField> {
                         controller: widget.controller,
                         focusNode: widget.focusNode,
                         autocorrect: false,
-                        autofocus: true,
+                        autofocus: widget.autofocus,
                         obscureText: widget.obscureText && !visible,
                         textInputAction: widget.textInputAction,
                         textAlignVertical: TextAlignVertical.center,
