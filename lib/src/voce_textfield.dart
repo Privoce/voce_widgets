@@ -153,7 +153,7 @@ class _VoceTextFieldState extends State<VoceTextField> {
 
                           return Text(
                             '$length/$maxLength',
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context).textTheme.labelSmall,
                           );
                           // }
                         },
